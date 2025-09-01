@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>NammaCity – Bangalore’s Civic Map</title>
+  <meta name="description" content="NammaCity helps citizens spot and share city events, issues, and updates on a live Google Map." />
+
+  <!-- social -->
+  <meta property="og:title" content="NammaCity – Bangalore’s Civic Map" />
+  <meta property="og:description" content="Spot & share city events on a live map. Sign in with Google or continue as guest." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://nammacityapp.com/" />
+  <meta property="og:image" content="data:image/svg+xml;utf8,
+  <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630'>
+    <rect width='100%' height='100%' fill='%23111'/>
+    <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Inter,Arial' font-size='72'>NammaCity</text>
+  </svg>">
+  <meta name="theme-color" content="#1e1b4b" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f4f1ff" media="(prefers-color-scheme: light)">
+
+  <style>
+    /* --------- design tokens --------- */
+    :root {
+      --radius: 20px;
+      --shadow-1: 0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
+      --shadow-2: 0 10px 40px rgba(0,0,0,.16), 0 3px 12px rgba(0,0,0,.08);
+      --card: #ffffff;
+      --soft: #f5f7fb;
+      --text: #0f172a;
+      --muted: #475569;
+      --outline: rgba(15, 23, 42, .08);
+
+      /* primary (mauve/indigo like your dark UI) */
+      --brand: #6366f1;
+      --brand-2: #8b5cf6;
+      --brand-3: #a78bfa;
+
+      --pill-bg: #eef2ff;
+      --pill-fg: #3730a3;
+      --cta: #111827;
+      --cta-fg: #eef2ff;
+      --accent: #c7d2fe;
+    }
+    /* Rose theme */
+    .theme-rose {
+      --brand: #e879f9;
+      --brand-2: #fb7185;
+      --brand-3: #fda4af;
+      --pill-bg: #ffe4e6;
+      --pill-fg: #9f1239;
+      --accent: #fecdd3;
+    }
+    /* Matcha / mint */
+    .theme-mint {
+      --brand: #34d399;
+      --brand-2: #22c55e;
+      --brand-3: #86efac;
+      --pill-bg: #dcfce7;
+      --pill-fg: #065f46;
+      --accent: #bbf7d0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --card: #0f1220;
+        --soft: #0b0e19;
+        --text: #eef2ff;
+        --muted: #c7d2fe;
+        --outline: rgba(148, 163, 184, .12);
+        --pill-bg: rgba(124, 58, 237, .25);
+        --pill-fg: #e9d5ff;
+        --cta: #4338ca;
+        --cta-fg: #eef2ff;
+        --accent: rgba(255,255,255,.06);
+      }
+    }
+
+    /* --------- base --------- */
+    * { box-sizing: border-box }
+    html, body { height: 100% }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 80% -10%, var(--accent), transparent 60%),
+        radial-gradient(1200px 600px at -10% 120%, var(--accent), transparent 60%),
+        var(--soft);
+      line-height: 1.5;
+    }
+    a { color: inherit; text-decoration: none }
+
+    /* --------- layout --------- */
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 80px }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; padding: 4px 0 12px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: .2px;
+    }
+    .logo {
+      width: 36px; height: 36px; border-radius: 12px; box-shadow: var(--shadow-1);
+      background: linear-gradient(180deg, #ffc300 50%, #e10600 0), #ffd54f;
+      outline: 3px solid rgba(0,0,0,.04);
+    }
+    .theme-switch {
+      display: flex; gap: 8px; align-items: center;
+      background: var(--card); border: 1px solid var(--outline);
+      padding: 6px; border-radius: 999px; box-shadow: var(--shadow-1);
+    }
+    .theme-btn {
+      font-size: 12px; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--outline);
+      background: var(--soft); cursor: pointer;
+    }
+    .theme-btn.active { background: var(--brand); color: white; border-color: transparent }
+
+    /* --------- hero card (sign-in) --------- */
+    .hero {
+      display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 10px;
+    }
+    .signin-card {
+      position: relative; margin: 8px auto; width: min(560px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02)) , var(--card);
+      border: 1px solid var(--outline); border-radius: calc(var(--radius) + 8px);
+      padding: 28px 24px; box-shadow: var(--shadow-2);
+    }
+    .signin-card .badge {
+      position: absolute; inset: -1px; pointer-events: none;
+      border-radius: calc(var(--radius) + 10px);
+      background:
+        radial-gradient(40% 20% at 50% 0%, rgba(255,255,255,.25), transparent),
+        linear-gradient(180deg, rgba(255,255,255,.12), transparent 30%),
+        linear-gradient(90deg, var(--brand) 0%, var(--brand-2) 50%, var(--brand-3) 100%);
+      opacity: .18;
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      padding: 1px;
+    }
+    .signin-head {
+      display: grid; gap: 8px; text-align: center; margin-bottom: 16px;
+    }
+    .signin-title { font-size: clamp(24px, 3.8vw, 34px); font-weight: 800; letter-spacing: .2px }
+    .signin-sub { color: var(--muted) }
+
+    .btn {
+      display: flex; gap: 10px; align-items: center; justify-content: center;
+      width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--outline);
+      background: var(--soft); font-weight: 600; cursor: pointer;
+      box-shadow: var(--shadow-1); transition: transform .05s ease, box-shadow .2s ease;
+    }
+    .btn:hover { transform: translateY(-1px) }
+    .btn:active { transform: translateY(0) }
+    .btn-primary { background: var(--cta); color: var(--cta-fg); border-color: transparent }
+    .btn-ghost   { background: var(--soft) }
+
+    .status {
+      margin-top: 14px; display: flex; align-items: center; gap: 10px;
+      background: var(--pill-bg); color: var(--pill-fg); padding: 10px 14px;
+      border-radius: 12px; border: 1px solid var(--outline);
+      box-shadow: var(--shadow-1);
+    }
+    .status svg { flex: 0 0 auto }
+
+    .powered { margin: 16px 0 0; text-align: center; color: var(--muted); font-size: 14px }
+
+    /* --------- map preview block --------- */
+    .map-block {
+      position: relative; margin: 22px auto 0; width: min(900px, 100%); height: 520px;
+      border-radius: calc(var(--radius) + 4px); overflow: hidden; border: 1px solid var(--outline);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.05)), var(--card);
+      box-shadow: var(--shadow-2);
+    }
+    .map-canvas {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(400px 240px at 70% 30%, rgba(99,102,241,.12), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.02)),
+        #dfe7f7;
+      filter: saturate(.95);
+    }
+    .map-topbar {
+      position: absolute; left: 12px; top: 10px; padding: 10px 14px;
+      background: rgba(255,255,255,.75); backdrop-filter: blur(8px);
+      border-radius: 12px; border: 1px solid var(--outline); font-weight: 700;
+      box-shadow: var(--shadow-1);
+    }
+    .fab-col {
+      position: absolute; right: 12px; bottom: 12px; display: grid; gap: 10px;
+    }
+    .fab {
+      width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center;
+      background: rgba(255,255,255,.85); backdrop-filter: blur(8px);
+      border: 1px solid var(--outline); box-shadow: var(--shadow-2); cursor: pointer;
+    }
+    .events-pill {
+      position: absolute; left: 12px; bottom: 20px;
+      background: rgba(255,255,255,.85); backdrop-filter: blur(8px);
+      padding: 14px 18px; border-radius: 16px; border: 1px solid var(--outline);
+      box-shadow: var(--shadow-2); font-weight: 700;
+      display: inline-flex; gap: 10px; align-items: center;
+    }
+
+    /* markers (decorative) */
+    .pin {
+      position: absolute; width: 46px; height: 46px; border-radius: 50% 50% 50% 0;
+      background: radial-gradient(circle at 40% 35%, #ffb703 0 35%, #fb8500 60%), #fb8500;
+      transform: rotate(-45deg);
+      box-shadow: 0 12px 20px rgba(0,0,0,.25);
+      border: 2px solid #2f2f2f;
+    }
+    .pin::after {
+      content: ""; position: absolute; inset: 6px; border-radius: 50%;
+      background: #333 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-size="54" fill="white">🚦</text></svg>') center/70% no-repeat;
+      transform: rotate(45deg);
+    }
+
+    /* responsive */
+    @media (min-width: 860px) {
+      .hero { grid-template-columns: 420px 1fr; align-items: center }
+      .signin-card { margin: 0 }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>NammaCity</div>
+      </div>
+
+      <div class="theme-switch" role="group" aria-label="Theme">
+        <button class="theme-btn" data-theme="base">Indigo</button>
+        <button class="theme-btn" data-theme="rose">Rose</button>
+        <button class="theme-btn" data-theme="mint">Matcha</button>
+        <button class="theme-btn" id="darkToggle" title="Follow system">Auto</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <!-- Sign-in card -->
+      <div class="signin-card" aria-labelledby="title">
+        <div class="badge" aria-hidden="true"></div>
+        <div class="signin-head">
+          <div style="display:grid;place-items:center;margin-bottom:6px;">
+            <div class="logo" style="width:64px;height:64px;border-radius:22px;outline-width:5px;"></div>
+          </div>
+          <h1 id="title" class="signin-title">NammaCity</h1>
+          <p class="signin-sub">Sign in with Google</p>
+        </div>
+
+        <a class="btn btn-primary" href="https://play.google.com/store/apps/details?id=com.sandworks.nammacity">
+          <!-- simple G icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 10v4h5.6A5.9 5.9 0 1 1 6.1 9.5" stroke="white" stroke-width="2" /></svg>
+          Continue with Google
+        </a>
+
+        <div style="height:10px"></div>
+
+        <button class="btn btn-ghost" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v8l6 3" stroke="currentColor" stroke-width="2"/></svg>
+          Continue as Guest
+        </button>
+
+        <div class="status" role="status" aria-live="polite">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="12" cy="16" r="1.4" fill="currentColor"/>
+            <path d="M12 6v6" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span id="statusText">Ready to sign in</span>
+        </div>
+
+        <div class="powered">Powered by Google Maps</div>
+      </div>
+
+      <!-- Map preview (static, styled like your screenshots) -->
+      <div class="map-block" aria-label="Map preview (decorative)">
+        <div class="map-canvas"></div>
+        <div class="map-topbar">NammaCity</div>
+
+        <div class="events-pill">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>
+          Show Events
+        </div>
+
+        <div class="fab-col">
+          <div class="fab" title="Zoom">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div class="fab" title="Add">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" /></svg>
+          </div>
+        </div>
+
+        <!-- decorative pins (like your traffic icons) -->
+        <div class="pin" style="left: 58%; top: 58%"></div>
+        <div class="pin" style="left: 66%; top: 68%"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // theme switching to mirror your different color variants
+    const root = document.documentElement;
+    const btns = document.querySelectorAll('.theme-btn');
+    const state = { theme: localStorage.getItem('nc-theme') || 'base' };
+
+    function apply(theme){
+      document.body.classList.remove('theme-rose','theme-mint');
+      if (theme === 'rose') document.body.classList.add('theme-rose');
+      if (theme === 'mint') document.body.classList.add('theme-mint');
+      state.theme = theme;
+      localStorage.setItem('nc-theme', theme);
+      btns.forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
+    }
+
+    btns.forEach(b => b.addEventListener('click', () => apply(b.dataset.theme)));
+    apply(state.theme);
+
+    // Fake status changes to echo your "Authenticating with Firebase..." screenshot
+    const statusText = document.getElementById('statusText');
+    let phase = 0;
+    setInterval(() => {
+      phase = (phase + 1) % 3;
+      statusText.textContent = [
+        'Ready to sign in',
+        'Authenticating with Firebase…',
+        'Signed out (guest mode)'
+      ][phase];
+    }, 6000);
+  </script>
+</body>
+</html>
