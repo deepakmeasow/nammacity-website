@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Namma City Marketplace</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    nav a { margin-right: 15px; }
+    .product-card { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    .product-title { font-weight: bold; font-size: 1.2em; }
+    .delivery-options { margin-top: 5px; font-size: 0.9em; color: #444; }
+  </style>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <h1>Namma City Marketplace</h1>
+  <nav>
+    <a href="/register.html" id="registerLink">Register</a>
+    <a href="/login.html" id="loginLink">Login</a>
+    <a href="/dashboard.html" id="dashboardLink" style="display:none;">Seller Dashboard</a>
+    <a href="#" id="logoutLink" style="display:none;">Logout</a>
+  </nav>
+  <section id="productsSection">
+    <h2>Available Products</h2>
+    <div id="products"></div>
+  </section>
+  <script>
+    // Adjust navigation links based on login state
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        document.getElementById('dashboardLink').style.display = 'inline';
+        document.getElementById('logoutLink').style.display = 'inline';
+        document.getElementById('registerLink').style.display = 'none';
+        document.getElementById('loginLink').style.display = 'none';
+        document.getElementById('logoutLink').addEventListener('click', (e) => {
+          e.preventDefault();
+          localStorage.removeItem('token');
+          window.location.reload();
+        });
+      }
+    });
+  </script>
+</body>
+</html>
