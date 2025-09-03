@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Dashboard - Namma City</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 960px; margin: auto; padding: 1rem; }
+    nav a { margin-right: 1rem; text-decoration: none; color: #0366d6; }
+    nav a:hover { text-decoration: underline; }
+    form { margin-top: 1rem; max-width: 600px; padding: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+    form label { display: block; margin-top: 0.5rem; }
+    form input, form textarea, form select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; }
+    form button { margin-top: 1rem; padding: 0.5rem 1rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    table th, table td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+    table th { background-color: #f2f2f2; }
+    .error { color: red; }
+    .success { color: green; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="marketplace.html">Marketplace</a>
+    <span id="logout" style="cursor:pointer; color:#d73a49;">Logout</span>
+  </nav>
+  <h1>Seller Dashboard</h1>
+  <div id="welcome"></div>
+  <h2>Add Product</h2>
+  <form id="productForm">
+    <label>Name
+      <input type="text" id="prodName" required>
+    </label>
+    <label>Description
+      <textarea id="prodDesc" rows="3"></textarea>
+    </label>
+    <label>Price (INR)
+      <input type="number" id="prodPrice" step="0.01" required>
+    </label>
+    <label>Inventory Quantity
+      <input type="number" id="prodInventory" step="1" required>
+    </label>
+    <label>Image URL (optional)
+      <input type="text" id="prodImage">
+    </label>
+    <label>Delivery Partner
+      <select id="prodDelivery">
+        <option value="">-- Select a partner --</option>
+      </select>
+    </label>
+    <button type="submit">Add Product</button>
+    <div id="formMessage"></div>
+  </form>
+  <h2>Your Products</h2>
+  <table id="productTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price (INR)</th>
+        <th>Inventory</th>
+        <th>Delivery Partner</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+  <script>
+    // Redirect to login if not authenticated
+    const token = localStorage.getItem('sellerToken');
+    if (!token) {
+      window.location.href = 'login.html';
+    }
+    // Fetch seller info (optional) and products
+    async function fetchProducts() {
+      const res = await fetch('/api/products', { headers: { 'x-auth-token': token } });
+      if (res.ok) {
+        const data = await res.json();
+        renderProductTable(data.products);
+      }
+    }
+    function renderProductTable(list) {
+      const tbody = document.querySelector('#productTable tbody');
+      tbody.innerHTML = '';
+      list.forEach(p => {
+        const row = document.createElement('tr');
+        const provider = deliveryPartners.find(dp => dp.id === p.deliveryPartnerId);
+        row.innerHTML = `<td>${p.name}</td><td>${p.price}</td><td>${p.inventory}</td><td>${provider ? provider.name : ''}</td><td><button data-id="${p.id}" class="deleteBtn">Delete</button></td>`;
+        tbody.appendChild(row);
+      });
+    }
+    // Load delivery partners for Bangalore
+    let deliveryPartners = [];
+    async function loadDeliveryPartners() {
+      const res = await fetch('/api/delivery-providers?city=Bangalore');
+      if (res.ok) {
+        const data = await res.json();
+        deliveryPartners = data.providers;
+        const select = document.getElementById('prodDelivery');
+        data.providers.forEach(dp => {
+          const opt = document.createElement('option');
+          opt.value = dp.id;
+          opt.textContent = `${dp.name} (₹${dp.baseFeeINR})`;
+          select.appendChild(opt);
+        });
+      }
+    }
+    // Add product handler
+    const productForm = document.getElementById('productForm');
+    const formMessage = document.getElementById('formMessage');
+    productForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      formMessage.textContent = '';
+      const payload = {
+        name: document.getElementById('prodName').value.trim(),
+        description: document.getElementById('prodDesc').value.trim(),
+        price: parseFloat(document.getElementById('prodPrice').value),
+        inventory: parseInt(document.getElementById('prodInventory').value, 10),
+        imageUrl: document.getElementById('prodImage').value.trim(),
+        deliveryPartnerId: document.getElementById('prodDelivery').value || null
+      };
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        formMessage.className = 'success';
+        formMessage.textContent = data.message;
+        productForm.reset();
+        // Clear and reload product list
+        fetchProducts();
+      } else {
+        formMessage.className = 'error';
+        formMessage.textContent = data.error || 'Failed to add product';
+      }
+    });
+    // Delete product handler
+    document.getElementById('productTable').addEventListener('click', async (e) => {
+      if (e.target.classList.contains('deleteBtn')) {
+        const id = e.target.getAttribute('data-id');
+        const res = await fetch('/api/products/' + id, {
+          method: 'DELETE',
+          headers: { 'x-auth-token': token }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          fetchProducts();
+        } else {
+          alert(data.error || 'Delete failed');
+        }
+      }
+    });
+    // Logout handler
+    document.getElementById('logout').addEventListener('click', () => {
+      localStorage.removeItem('sellerToken');
+      window.location.href = 'index.html';
+    });
+    // Initialise page
+    loadDeliveryPartners().then(fetchProducts);
+  </script>
+</body>
+</html>

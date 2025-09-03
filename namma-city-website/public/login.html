@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login – Namma City</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    form { max-width: 400px; }
+    label { display: block; margin-top: 10px; }
+    input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+    button { margin-top: 15px; padding: 8px 12px; }
+    .message { margin-top: 10px; color: green; }
+    .error { margin-top: 10px; color: red; }
+  </style>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <h1>Seller Login</h1>
+  <form id="loginForm">
+    <label>Email
+      <input type="email" name="email" required>
+    </label>
+    <label>Password
+      <input type="password" name="password" required>
+    </label>
+    <button type="submit">Login</button>
+  </form>
+  <div class="message" id="message"></div>
+  <div class="error" id="error"></div>
+  <p>Don't have an account? <a href="/register.html">Register here</a>.</p>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        email: form.email.value,
+        password: form.password.value,
+      };
+      const resp = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const out = await resp.json();
+      if (resp.ok) {
+        localStorage.setItem('token', out.token);
+        document.getElementById('message').textContent = 'Login successful! Redirecting to dashboard...';
+        document.getElementById('error').textContent = '';
+        setTimeout(() => {
+          window.location.href = '/dashboard.html';
+        }, 1000);
+      } else {
+        document.getElementById('error').textContent = out.error || 'Login failed';
+        document.getElementById('message').textContent = '';
+      }
+    });
+  </script>
+</body>
+</html>
