@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="split" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="50%" stop-color="#FFD600"/>
+      <stop offset="50%" stop-color="#D32F2F"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#split)"/>
+  <text x="50%" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="bold" fill="#D32F2F">Namma</text>
+  <text x="50%" y="54" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="bold" fill="#FFD600">City</text>
+</svg>
