@@ -1,3 +1,6 @@
+Allow: /
+
+Sitemap: https://deepakmeasow.github.io/nammacity-website/sitemap.xml
 User-agent: *
 Allow: /
 
